@@ -1,7 +1,7 @@
-name: Run Node Server with Tunnel
+name: Run Node Server with Cloudflared Tunnel
 
 on:
-  workflow_dispatch:   # manual run from GitHub UI
+  workflow_dispatch:
 
 jobs:
   run-server:
@@ -22,12 +22,14 @@ jobs:
       - name: Build project
         run: npm run build
 
+      # ✅ FIXED: Proper cloudflared installation (NOT apt-get)
       - name: Install Cloudflared
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cloudflared
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
 
-      - name: Start server + tunnel
+      # ⚠️ Start server and expose via tunnel
+      - name: Start server + Cloudflare tunnel
         run: |
           node dist/server.js &
           sleep 5
