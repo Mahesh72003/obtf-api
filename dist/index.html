@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dynamic Swagger UI</title>
+    <link rel="icon" type="image/png" href="favicon-32x32.png" />
+    <link rel="stylesheet" href="./swagger-ui.css" />
+    <link rel="stylesheet" href="./index.css" />
+    <style>
+      /* General Body Styles */
+      body {
+        background-color: #2a2e30;
+        font-family: Arial, sans-serif;
+        color: white;
+      }
+
+      /* Heading Style */
+      h1 {
+        text-align: center;
+        padding-top: 5px;
+        color: rgb(194, 186, 186);
+      }
+
+      /* Styling the select dropdown */
+      #swaggerSelector {
+        background-color: #1c2022;
+        color: rgba(222, 222, 222, 0.993);
+        border: 10cm;
+        border-style: solid;
+        border-bottom: #1d632e;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 50%;
+        margin: 20px auto;
+        display: block;
+        transition: all 0.3s ease-in-out;
+      }
+
+      /* Hover Effect on the Select */
+      #swaggerSelector:hover {
+        border-color: #3b3a34;
+      }
+
+      /* Styling the 'Explore' Button */
+      .explore-button {
+        background-color: #4caf50;
+        color: white;
+        padding: 12px 24px;
+        text-align: center;
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      /* Hover Effect on the Button */
+      .explore-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Select a Service</h1>
+    <select style="border: 3cm" id="swaggerSelector"></select>
+    <div id="swagger-ui"></div>
+
+    <script src="./swagger-ui-bundle.js"></script>
+    <script src="./swagger-ui-standalone-preset.js"></script>
+    <script>
+      async function loadSwaggerList() {
+        const res = await fetch("/api/swagger-list");
+        const list = await res.json();
+        const selector = document.getElementById("swaggerSelector");
+
+        list.forEach((service) => {
+          const option = document.createElement("option");
+          option.value = service.url;
+          option.textContent = service.name;
+          selector.appendChild(option);
+        });
+
+        // Load first service by default
+        loadSwagger(list[0].url);
+
+        selector.addEventListener("change", () => {
+          loadSwagger(selector.value);
+        });
+      }
+
+      function loadSwagger(url) {
+        SwaggerUIBundle({
+          url: url,
+          dom_id: "#swagger-ui",
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: "StandaloneLayout",
+        });
+      }
+
+      loadSwaggerList();
+    </script>
+  </body>
+</html>
